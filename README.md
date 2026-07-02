@@ -231,27 +231,41 @@ Faites preuve de pédagogie et soyez clair dans vos explications et procedures d
 **Exercice 1 :**  
 Quels sont les composants dont la perte entraîne une perte de données ?  
   
-*..Répondez à cet exercice ici..*
+La perte des composants suivants peut entraîner une perte de données :
+
+- Le **PVC pra-data** : il contient la base de données SQLite utilisée par l'application. Sa suppression entraîne la perte des données de production.
+
+- Le **PVC pra-backup** : il contient les sauvegardes automatiques. Si ce volume est perdu, il devient impossible de restaurer les données après un incident.
+
+- **Les deux PVC simultanément** : si pra-data et pra-backup sont perdus, toutes les données sont définitivement perdues.
+
 
 **Exercice 2 :**  
-Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC pra-data  
+Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC ``pra-data``  
   
-*..Répondez à cet exercice ici..*
+Lors de la suppression du PVC ``pra-data``, la base de données de production est effectivement perdue. Cependant, des sauvegardes automatiques sont réalisées toutes les minutes par un CronJob Kubernetes et sont stockées dans un second volume persistant (``pra-backup``).
+
+Après avoir recréé un nouveau PVC ``pra-data``, un Job Kubernetes restaure la dernière sauvegarde depuis ``pra-backup``. Les données sont ainsi récupérées.
 
 **Exercice 3 :**  
 Quels sont les RTO et RPO de cette solution ?  
   
-*..Répondez à cet exercice ici..*
+- RPO (Recovery Point Objective) : environ 1 minute.
+
+Les sauvegardes étant réalisées toutes les minutes, la perte maximale de données est d'environ une minute.
+
+ - RTO (Recovery Time Objective) : quelques seconde.
 
 **Exercice 4 :**  
 Pourquoi cette solution (cet atelier) ne peux pas être utilisé dans un vrai environnement de production ? Que manque-t-il ?   
   
-*..Répondez à cet exercice ici..*
-  
+Cette architecture est adaptée à un atelier pédagogique
+example : SQLite n'est pas adaptée à une application fortement utilisée
+
 **Exercice 5 :**  
 Proposez une archtecture plus robuste.   
   
-*..Répondez à cet exercice ici..*
+Utiliser loadLoad Balancer ?
 
 ---------------------------------------------------
 Séquence 6 : Ateliers  
